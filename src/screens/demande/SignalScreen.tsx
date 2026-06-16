@@ -39,6 +39,27 @@ export default function SignalScreen() {
   }
 };
 
+const handlePickImage = async () => {
+  const permission =
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  if (!permission.granted) {
+    alert("Autorisation galerie refusée");
+    return;
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 0.8,
+  });
+
+  if (!result.canceled) {
+    setImage(result.assets[0].uri);
+  }
+};
+
 const getCurrentLocation = async () => {
   const { status } =
     await Location.requestForegroundPermissionsAsync();
@@ -84,15 +105,13 @@ const getCurrentLocation = async () => {
 
         <TouchableOpacity
           style={styles.imagePicker}
-          onPress={handleTakePhoto}
+          onPress={handlePickImage}
+          activeOpacity={0.8}
         >
           {image ? (
-            <Image
-              source={{ uri: image }}
-              style={styles.image}
-            />
+            <Image source={{ uri: image }} style={styles.image} />
           ) : (
-            <>
+            <View style={styles.imageEmpty}>
               <MaterialIcons
                 name="photo-camera"
                 size={45}
@@ -104,13 +123,14 @@ const getCurrentLocation = async () => {
               </Text>
 
               <Text style={styles.imageSubText}>
-                Prenez ou sélectionnez une photo
+                Prenez ou sélectionnez une image du problème
               </Text>
-            </>
+            </View>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cameraButton}>
+        <TouchableOpacity style={styles.cameraButton}
+          onPress={handleTakePhoto}>
           <MaterialIcons
             name="camera-alt"
             size={20}
@@ -254,6 +274,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderStyle: "dashed",
     borderColor: "#0E693D",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  imageEmpty: {
     justifyContent: "center",
     alignItems: "center",
   },
