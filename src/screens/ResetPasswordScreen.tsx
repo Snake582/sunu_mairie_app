@@ -10,13 +10,18 @@ import {
 const API_URL =
   process.env.EXPO_PUBLIC_API_URL;
 
-export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState("");
+export default function ResetPasswordScreen(
+  { route }: any
+) {
+  const { token } = route.params;
 
-  const handleSubmit = async () => {
+  const [password, setPassword] =
+    useState("");
+
+  const handleReset = async () => {
     try {
       const response = await fetch(
-        `${API_URL}/auth/forgot-password`,
+        `${API_URL}/auth/reset-password`,
         {
           method: "POST",
           headers: {
@@ -24,7 +29,8 @@ export default function ForgotPasswordScreen() {
               "application/json",
           },
           body: JSON.stringify({
-            email,
+            token,
+            password,
           }),
         }
       );
@@ -39,7 +45,7 @@ export default function ForgotPasswordScreen() {
     } catch (error) {
       Alert.alert(
         "Erreur",
-        "Impossible d'envoyer l'email"
+        "Impossible de modifier le mot de passe"
       );
     }
   };
@@ -47,9 +53,10 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={{ padding: 20 }}>
       <TextInput
-        placeholder="Votre email"
-        value={email}
-        onChangeText={setEmail}
+        placeholder="Nouveau mot de passe"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
         style={{
           borderWidth: 1,
           padding: 12,
@@ -58,7 +65,7 @@ export default function ForgotPasswordScreen() {
       />
 
       <TouchableOpacity
-        onPress={handleSubmit}
+        onPress={handleReset}
         style={{
           backgroundColor: "#1F8B4C",
           padding: 15,
@@ -71,7 +78,7 @@ export default function ForgotPasswordScreen() {
             textAlign: "center",
           }}
         >
-          Envoyer
+          Modifier
         </Text>
       </TouchableOpacity>
     </View>
