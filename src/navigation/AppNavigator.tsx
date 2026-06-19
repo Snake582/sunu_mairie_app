@@ -14,6 +14,7 @@ import EditProfilScreen from "../screens/profile/EditProfilScreen";
 import MesInformationsScreen from "../screens/profile/MesInformationsScreen";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import ResetPasswordScreen from "../screens/ResetPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
+        />
+
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
         />
 
         <Stack.Screen

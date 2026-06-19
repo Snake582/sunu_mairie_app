@@ -25,8 +25,9 @@ export default function ProfilScreen({ navigation }: any) {
 
       if (!token) return;
 
+      const API_URL = process.env.EXPO_PUBLIC_API_URL;
       const response = await fetch(
-        "http://192.168.1.8:3000/users/profile",
+        `${API_URL}/users/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,11 +54,13 @@ const getPhoto = () => {
 
   if (user.photo.startsWith("http")) return user.photo;
 
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
   if (user.photo.startsWith("uploads/")) {
-    return `http://192.168.1.8:3000/${user.photo}`;
+    return `${API_URL}/${user.photo}`;
   }
 
-  return `http://192.168.1.8:3000/uploads/${user.photo}`;
+  return `${API_URL}/uploads/${user.photo}`;
 };
 
   const logout = async () => {
@@ -160,7 +163,7 @@ const getPhoto = () => {
       </View>
 
       {/* DECONNEXION */}
-      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+      <TouchableOpacity style={styles.logoutButton} onPress={logout} activeOpacity={0.85}>
         <MaterialIcons
           name="logout"
           size={22}
@@ -360,6 +363,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: "#DC2626",
     margin: 20,
+    marginBottom: 110,
     paddingVertical: 16,
     borderRadius: 18,
     flexDirection: "row",

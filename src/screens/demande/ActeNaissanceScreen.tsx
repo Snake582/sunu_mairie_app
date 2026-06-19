@@ -14,7 +14,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function ActeNaissanceScreen() {
+export default function ActeNaissanceScreen({ navigation }: any) {
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [dateNaissance, setDateNaissance] = useState("");
@@ -42,7 +42,8 @@ export default function ActeNaissanceScreen() {
 
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await fetch("http://192.168.1.8:3000/requests", {
+      const API_URL = process.env.EXPO_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +77,13 @@ if (!response.ok) {
 
       Alert.alert(
         "Demande enregistrée",
-        "Votre demande d'acte de naissance a été envoyée avec succès."
+        "Votre demande d'acte de naissance a été envoyée avec succès.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+          },
+        ]
       );
     } catch (error: any) {
   console.log(error);

@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function MariageScreen() {
+export default function MariageScreen({ navigation }: any) {
   const [prenomEpoux, setPrenomEpoux] = useState("");
   const [nomEpoux, setNomEpoux] = useState("");
 
@@ -85,8 +85,9 @@ export default function MariageScreen() {
     try {
       const token = await AsyncStorage.getItem("token");
 
+      const API_URL = process.env.EXPO_PUBLIC_API_URL;
       const response = await fetch(
-        "http://192.168.1.8:3000/requests",
+        `${API_URL}/requests`,
         {
           method: "POST",
           headers: {
@@ -137,7 +138,13 @@ export default function MariageScreen() {
 
       Alert.alert(
         "Demande enregistrée",
-        "Votre demande de certificat de mariage a été envoyée avec succès."
+        "Votre demande de certificat de mariage a été envoyée avec succès.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+          },
+        ]
       );
     } catch (error: any) {
       console.log(error);

@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function DecesScreen() {
+export default function DecesScreen({ navigation }: any) {
   const [prenomDefunt, setPrenomDefunt] = useState("");
   const [nomDefunt, setNomDefunt] = useState("");
   const [dateNaissance, setDateNaissance] = useState("");
@@ -56,8 +56,9 @@ export default function DecesScreen() {
     const token =
       await AsyncStorage.getItem("token");
 
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const response = await fetch(
-      "http://192.168.1.8:3000/requests",
+      `${API_URL}/requests`,
       {
         method: "POST",
         headers: {
@@ -101,7 +102,13 @@ export default function DecesScreen() {
 
     Alert.alert(
       "Succès",
-      "Signalement envoyé avec succès."
+      "Signalement envoyé avec succès.",
+      [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+        },
+      ]
     );
 
     setPrenomDefunt("");
