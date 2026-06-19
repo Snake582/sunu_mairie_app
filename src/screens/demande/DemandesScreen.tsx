@@ -9,34 +9,35 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // import axios from "axios";
 
-type Demande = {
-  id: string;
-  numero: string;
-  service: string;
-  date: string;
-  status: string;
-};
-
 export default function DemandesScreen() {
-  const [demandes, setDemandes] = useState<Demande[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDemandes();
+    loadRequests();
   }, []);
 
-  const fetchDemandes = async () => {
+  const loadRequests = async () => {
     try {
-      // const response = await axios.get(
-      //   "http://TON_BACKEND/api/demandes"
-      // );
-      //
-      // setDemandes(response.data);
+      const token = await AsyncStorage.getItem("token");
 
-      // temporaire
-      setDemandes([]);
+      const response = await fetch(
+        "http://192.168.1.8:3000/requests/my-requests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("REQUESTS :", data);
+
+      setRequests(Array.isArray(data) ? data : []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -44,34 +45,44 @@ export default function DemandesScreen() {
     }
   };
 
+  const total = requests.length;
+
+  const enCours = requests.filter(
+    (item) => item.status === "pending"
+  ).length;
+
+  const validees = requests.filter(
+    (item) => item.status === "approved"
+  ).length;
+
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "EN_ATTENTE":
+      case "pending":
         return {
           color: "#F59E0B",
           icon: "schedule",
           label: "En attente",
         };
 
-      case "VALIDE":
+      case "approved":
         return {
           color: "#22C55E",
           icon: "check-circle",
-          label: "Validé",
+          label: "Validée",
         };
 
-      case "PRET":
+      case "ready":
         return {
           color: "#3B82F6",
           icon: "inventory",
-          label: "Prêt à retirer",
+          label: "Prête",
         };
 
-      case "REJETE":
+      case "rejected":
         return {
           color: "#EF4444",
           icon: "cancel",
-          label: "Rejeté",
+          label: "Rejetée",
         };
 
       default:
@@ -82,16 +93,6 @@ export default function DemandesScreen() {
         };
     }
   };
-
-  const total = demandes.length;
-
-  const enCours = demandes.filter(
-    (d) => d.status === "EN_ATTENTE"
-  ).length;
-
-  const validees = demandes.filter(
-    (d) => d.status === "VALIDE"
-  ).length;
 
   return (
     <View style={styles.container}>
@@ -153,7 +154,7 @@ export default function DemandesScreen() {
             Chargement des demandes...
           </Text>
         </View>
-      ) : demandes.length === 0 ? (
+      ) : requests.length === 0 ? (
         <View style={styles.center}>
           <MaterialIcons
             name="folder-open"
@@ -172,8 +173,10 @@ export default function DemandesScreen() {
         </View>
       ) : (
         <FlatList
-          data={demandes}
-          keyExtractor={(item) => item.id}
+          data={requests}
+          keyExtractor={(item) =>
+            item.id.toString()
+          }
           contentContainerStyle={styles.list}
           renderItem={({ item }) => {
             const config = getStatusConfig(
@@ -189,8 +192,7 @@ export default function DemandesScreen() {
                   style={[
                     styles.iconContainer,
                     {
-                      backgroundColor:
-                        `${config.color}20`,
+                      backgroundColor: `${config.color}20`,
                     },
                   ]}
                 >
@@ -203,15 +205,17 @@ export default function DemandesScreen() {
 
                 <View style={styles.content}>
                   <Text style={styles.service}>
-                    {item.service}
+                    {item.type}
                   </Text>
 
                   <Text style={styles.numero}>
-                    Dossier : {item.numero}
+                    Dossier #{item.id}
                   </Text>
 
                   <Text style={styles.date}>
-                    Déposé le {item.date}
+                    {new Date(
+                      item.createdAt
+                    ).toLocaleDateString()}
                   </Text>
 
                   <View

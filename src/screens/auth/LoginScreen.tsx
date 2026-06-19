@@ -1,4 +1,5 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,9 +10,65 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 
 export default function LoginScreen({ navigation }: any) {
+  const [email, setEmail]= useState("");
+  const [password, setPassword]= useState("");
+
+  const handleLogin = async () => {
+  if (!email || !password) {
+    Alert.alert(
+      "Erreur",
+      "Veuillez remplir tous les champs"
+    );
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://192.168.1.8:3000/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        Array.isArray(data.message)
+          ? data.message.join("\n")
+          : data.message
+      );
+    }
+
+    await AsyncStorage.setItem(
+      "token",
+      data.access_token
+    );
+
+    Alert.alert(
+      "Succès",
+      "Connexion réussie"
+    );
+
+    navigation.replace("Main");
+  } catch (error: any) {
+    Alert.alert(
+      "Erreur",
+      error.message || "Connexion impossible"
+    );
+  }
+};
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -38,16 +95,21 @@ export default function LoginScreen({ navigation }: any) {
           <Text style={styles.label}>Adresse email</Text>
           <TextInput
             placeholder="exemple@email.com"
+            keyboardType="email-address"
             placeholderTextColor="#999"
             style={styles.input}
+            value={email}
+            onChangeText={setEmail}
           />
 
           <Text style={styles.label}>Mot de passe</Text>
           <TextInput
             placeholder="••••••••"
-            placeholderTextColor="#999"
             secureTextEntry
+            placeholderTextColor="#999"
             style={styles.input}
+            value={password}
+            onChangeText={setPassword}
           />
 
           <TouchableOpacity>
@@ -58,7 +120,7 @@ export default function LoginScreen({ navigation }: any) {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Main")}
+            onPress={handleLogin}
           >
             <Text style={styles.buttonText}>
               Se connecter

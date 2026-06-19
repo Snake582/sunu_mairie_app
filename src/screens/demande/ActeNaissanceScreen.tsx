@@ -8,8 +8,11 @@ import {
   StyleSheet,
   Alert,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ActeNaissanceScreen() {
   const [prenom, setPrenom] = useState("");
@@ -22,7 +25,7 @@ export default function ActeNaissanceScreen() {
   const [copies, setCopies] = useState("");
   const [motif, setMotif] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !prenom ||
       !nom ||
@@ -37,13 +40,63 @@ export default function ActeNaissanceScreen() {
       return;
     }
 
-    Alert.alert(
-      "Demande enregistrée",
-      "Votre demande d'acte de naissance a été envoyée avec succès."
-    );
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch("http://192.168.1.8:3000/requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: "naissance",
+          data: {
+            prenom,
+            nom,
+            dateNaissance,
+            lieuNaissance,
+            telephone,
+            nomPere,
+            nomMere,
+            copies,
+            motif,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+console.log("REQUEST RESPONSE :", data);
+
+if (!response.ok) {
+  throw new Error(
+    data.message || "Erreur inconnue"
+  );
+}
+
+      Alert.alert(
+        "Demande enregistrée",
+        "Votre demande d'acte de naissance a été envoyée avec succès."
+      );
+    } catch (error: any) {
+  console.log(error);
+
+  Alert.alert(
+    "Erreur",
+    error.message
+  );
+}
   };
 
   return (
+      <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={
+      Platform.OS === "ios"
+        ? "padding"
+        : "height"
+    }
+  >
     <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
@@ -63,6 +116,7 @@ export default function ActeNaissanceScreen() {
       </View>
 
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
@@ -178,6 +232,7 @@ export default function ActeNaissanceScreen() {
         <View style={{ height: 30 }} />
       </ScrollView>
     </View>
+    </KeyboardAvoidingView>
   );
 }
 

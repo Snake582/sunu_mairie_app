@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/home/HomeScreen";
 import DemandesScreen from "../screens/demande/DemandesScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import ProfilScreen from "../screens/profile/ProfilScreen";
-
-import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 
@@ -15,36 +15,87 @@ export default function TabNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
 
-        tabBarIcon: ({ color, size }) => {
+        tabBarShowLabel: false,
+
+        tabBarStyle: {
+          position: "absolute",
+          bottom: 15,
+          left: 15,
+          right: 15,
+          height: 75,
+          borderRadius: 25,
+          backgroundColor: "#FFF",
+          borderTopWidth: 0,
+
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 10,
+          },
+          shadowOpacity: 0.08,
+          shadowRadius: 15,
+          elevation: 10,
+        },
+
+        tabBarIcon: ({ focused }) => {
           let iconName: any;
 
-          if (route.name === "Accueil") {
-            iconName = "home";
-          }
+          switch (route.name) {
+            case "Accueil":
+              iconName = "home";
+              break;
 
-          if (route.name === "Demandes") {
-            iconName = "document-text";
-          }
+            case "Demandes":
+              iconName = "document-text";
+              break;
 
-          if (route.name === "Notifications") {
-            iconName = "notifications";
-          }
+            case "Notifications":
+              iconName = "notifications";
+              break;
 
-          if (route.name === "Profil") {
-            iconName = "person";
+            case "Profil":
+              iconName = "person";
+              break;
           }
 
           return (
-            <Ionicons
-              name={iconName}
-              size={size}
-              color={color}
-            />
+            <View
+              style={{
+                width: focused ? 58 : 45,
+                height: focused ? 58 : 45,
+                borderRadius: 30,
+
+                backgroundColor: focused
+                  ? "#0E693D"
+                  : "transparent",
+
+                justifyContent: "center",
+                alignItems: "center",
+
+                marginTop: focused ? -25 : 0,
+
+                shadowColor: focused
+                  ? "#0E693D"
+                  : "transparent",
+
+                shadowOffset: {
+                  width: 0,
+                  height: 8,
+                },
+
+                shadowOpacity: 0.35,
+                shadowRadius: 10,
+                elevation: focused ? 8 : 0,
+              }}
+            >
+              <Ionicons
+                name={iconName}
+                size={focused ? 28 : 24}
+                color={focused ? "#FFF" : "#94A3B8"}
+              />
+            </View>
           );
         },
-
-        tabBarActiveTintColor: "#1B2A4A",
-        tabBarInactiveTintColor: "gray",
       })}
     >
       <Tab.Screen
@@ -66,7 +117,6 @@ export default function TabNavigator() {
         name="Profil"
         component={ProfilScreen}
       />
-      
     </Tab.Navigator>
   );
 }

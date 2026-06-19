@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,140 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function RegisterScreen({ navigation }: any) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [numeroCni, setNumeroCni] = useState("");
+
+const handleRegister = async () => {
+  try {
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !password
+    ) {
+      Alert.alert(
+        "Erreur",
+        "Veuillez remplir tous les champs obligatoires"
+      );
+      return;
+    }
+
+    let imageUrl = "";
+
+    // Upload photo si sélectionnée
+    if (photo) {
+      const uploadResult = await uploadImage();
+      imageUrl = uploadResult.imageUrl;
+    }
+
+    const response = await fetch(
+      "http://192.168.1.8:3000/users/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          password,
+          adresse,
+          numeroCni,
+          photo: imageUrl,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        Array.isArray(data.message)
+          ? data.message.join("\n")
+          : data.message
+      );
+    }
+
+    Alert.alert(
+      "Succès",
+      "Compte créé avec succès"
+    );
+
+    navigation.navigate("Login");
+  } catch (error: any) {
+    Alert.alert(
+      "Erreur",
+      error.message ||
+        "Une erreur est survenue"
+    );
+  }
+};
+
+const uploadImage = async () => {
+  const formData = new FormData();
+
+  formData.append(
+    "photo",
+    {
+      uri: photo,
+      name: "profile.jpg",
+      type: "image/jpeg",
+    } as any
+  );
+
+  const response = await fetch(
+    "http://192.168.1.9:3000/users/upload",
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Erreur lors de l'upload de la photo"
+    );
+  }
+
+  return await response.json();
+};
+
+const pickImage = async () => {
+  const permission =
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  if (!permission.granted) {
+    Alert.alert(
+      "Permission refusée",
+      "Veuillez autoriser l'accès à la galerie"
+    );
+    return;
+  }
+
+  const result =
+    await ImagePicker.launchImageLibraryAsync({
+      mediaTypes:
+        ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+  if (!result.canceled) {
+    setPhoto(result.assets[0].uri);
+  }
+};
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -43,41 +174,86 @@ export default function RegisterScreen({ navigation }: any) {
               placeholder="Votre nom complet"
               placeholderTextColor="#94A3B8"
               style={styles.input}
+              value={fullName}
+              onChangeText={setFullName}
             />
 
-            <Text style={styles.label}>Adresse email</Text>
-            <TextInput
-              placeholder="exemple@email.com"
-              keyboardType="email-address"
-              placeholderTextColor="#94A3B8"
-              style={styles.input}
-            />
+           <Text style={styles.label}>Adresse email</Text>
+             <TextInput
+               placeholder="exemple@email.com"
+               keyboardType="email-address"
+               placeholderTextColor="#94A3B8"
+               style={styles.input}
+               value={email}
+               onChangeText={setEmail}
+             />
 
-            <Text style={styles.label}>Numéro de téléphone</Text>
-            <TextInput
-              placeholder="77 000 00 00"
-              keyboardType="phone-pad"
-              placeholderTextColor="#94A3B8"
-              style={styles.input}
-            />
+             <Text style={styles.label}>Numéro de téléphone</Text>
+             <TextInput
+               placeholder="77 000 00 00"
+               keyboardType="phone-pad"
+               placeholderTextColor="#94A3B8"
+               style={styles.input}
+               value={phone}
+               onChangeText={setPhone}
+             />
 
-            <Text style={styles.label}>Mot de passe</Text>
-            <TextInput
-              placeholder="••••••••"
-              secureTextEntry
-              placeholderTextColor="#94A3B8"
-              style={styles.input}
-            />
+             <Text style={styles.label}>Mot de passe</Text>
+             <TextInput
+               placeholder="mot de passe"
+               secureTextEntry
+               placeholderTextColor="#94A3B8"
+               style={styles.input}
+               value={password}
+               onChangeText={setPassword}
+             />
 
-            <Text style={styles.label}>Confirmer le mot de passe</Text>
-            <TextInput
-              placeholder="••••••••"
-              secureTextEntry
-              placeholderTextColor="#94A3B8"
-              style={styles.input}
-            />
+             <Text style={styles.label}>Adresse</Text>
+              <TextInput
+                placeholder="Votre adresse"
+                placeholderTextColor="#94A3B8"
+                style={styles.input}
+                value={adresse}
+                onChangeText={setAdresse}
+              />
 
-            <TouchableOpacity style={styles.button}>
+              <Text style={styles.label}>Numéro CNI</Text>
+              <TextInput
+                placeholder="1234567890123"
+                keyboardType="numeric"
+                placeholderTextColor="#94A3B8"
+                style={styles.input}
+                value={numeroCni}
+                onChangeText={setNumeroCni}
+              />
+
+              <TouchableOpacity onPress={pickImage}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    color: "#0E693D",
+                    marginBottom: 10,
+                    fontWeight: "600",
+                  }}
+                >
+                  Choisir une photo
+                </Text>
+              </TouchableOpacity>
+
+              {photo && (
+                <Image
+                  source={{ uri: photo }}
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    alignSelf: "center",
+                    marginBottom: 15,
+                  }}
+                />
+              )}
+
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>
                 Créer mon compte
               </Text>

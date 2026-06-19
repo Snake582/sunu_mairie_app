@@ -9,9 +9,12 @@ import {
   Alert,
   Image,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function DecesScreen() {
   const [prenomDefunt, setPrenomDefunt] = useState("");
@@ -28,6 +31,98 @@ export default function DecesScreen() {
 
   const [certificat, setCertificat] = useState<string | null>(null);
   const [pieceIdentite, setPieceIdentite] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+  if (
+    !prenomDefunt ||
+    !nomDefunt ||
+    !dateNaissance ||
+    !dateDeces ||
+    !lieuDeces ||
+    !declarant ||
+    !telephone ||
+    !adresse ||
+    !copies ||
+    !motif 
+  ) {
+    Alert.alert(
+      "Champs obligatoires",
+      "Veuillez remplir tous les champs requis."
+    );
+    return;
+  }
+
+  try {
+    const token =
+      await AsyncStorage.getItem("token");
+
+    const response = await fetch(
+      "http://192.168.1.8:3000/requests",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: "deces",
+          data: {
+            prenomDefunt,
+            nomDefunt,
+            dateNaissance,
+            dateDeces,
+            lieuDeces,
+            declarant,
+            telephone,
+            adresse,
+            copies,
+            motif
+          },
+        }),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "REQUEST RESPONSE :",
+      data
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        Array.isArray(data.message)
+          ? data.message.join(", ")
+          : data.message
+      );
+    }
+
+    Alert.alert(
+      "Succès",
+      "Signalement envoyé avec succès."
+    );
+
+    setPrenomDefunt("");
+    setNomDefunt("");
+    setDateNaissance("");
+    setDateDeces("");
+    setLieuDeces("");
+    setDeclarant("");
+    setTelephone("");
+    setAdresse("");
+    setCopies("");
+    setMotif("");
+  } catch (error: any) {
+    console.log(error);
+
+    Alert.alert(
+      "Erreur",
+      error.message
+    );
+  }
+};
 
   const pickImage = async (
     type: "certificat" | "piece"
@@ -58,30 +153,15 @@ export default function DecesScreen() {
     }
   };
 
-  const handleSubmit = () => {
-    if (
-      !prenomDefunt ||
-      !nomDefunt ||
-      !dateDeces ||
-      !lieuDeces ||
-      !declarant ||
-      !telephone
-    ) {
-      Alert.alert(
-        "Champs obligatoires",
-        "Veuillez remplir tous les champs requis."
-      );
-      return;
-    }
-
-    Alert.alert(
-      "Demande envoyée",
-      "Votre demande d'acte de décès a été enregistrée avec succès."
-    );
-  };
-
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : "height"
+        }>
+        <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="#0E693D"
@@ -232,8 +312,8 @@ export default function DecesScreen() {
             <Image
               source={{ uri: pieceIdentite }}
               style={styles.preview}
-            />
-          ) : (
+              />
+            ) : (
             <>
               <MaterialIcons
                 name="badge"
@@ -272,7 +352,8 @@ export default function DecesScreen() {
             color="#FFF"
           />
 
-          <Text style={styles.buttonText}>
+          <Text style={styles.buttonText}
+          onPress={handleSubmit}>
             Envoyer la demande
           </Text>
         </TouchableOpacity>
@@ -280,6 +361,7 @@ export default function DecesScreen() {
         <View style={{ height: 30 }} />
       </ScrollView>
     </View>
+      </KeyboardAvoidingView>
   );
 }
 

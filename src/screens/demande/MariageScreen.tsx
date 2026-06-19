@@ -9,9 +9,12 @@ import {
   Alert,
   Image,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MariageScreen() {
   const [prenomEpoux, setPrenomEpoux] = useState("");
@@ -59,7 +62,7 @@ export default function MariageScreen() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !prenomEpoux ||
       !nomEpoux ||
@@ -67,7 +70,10 @@ export default function MariageScreen() {
       !nomEpouse ||
       !dateMariage ||
       !lieuMariage ||
-      !telephone
+      !telephone ||
+      !acteMariage ||
+      !pieceIdentite ||
+      !motif
     ) {
       Alert.alert(
         "Champs obligatoires",
@@ -76,14 +82,82 @@ export default function MariageScreen() {
       return;
     }
 
-    Alert.alert(
-      "Demande enregistrée",
-      "Votre demande de certificat de mariage a été envoyée avec succès."
-    );
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(
+        "http://192.168.1.8:3000/requests",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: "mariage",
+            data: {
+              prenomEpoux,
+              nomEpoux,
+              prenomEpouse,
+              nomEpouse,
+              dateMariage,
+              lieuMariage,
+              acteMariage,
+              pieceIdentite,
+              telephone,
+              copies,
+              motif,
+            },
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("REQUEST RESPONSE :", data);
+
+      if (!response.ok) {
+        throw new Error(
+          Array.isArray(data.message)
+            ? data.message.join(", ")
+            : data.message
+        );
+      }
+
+      setPrenomEpoux("");
+      setNomEpoux("");
+      setPrenomEpouse("");
+      setNomEpouse("");
+      setDateMariage("");
+      setLieuMariage("");
+      setActeMariage(null);
+      setTelephone("");
+      setCopies("");
+      setMotif("");
+
+      Alert.alert(
+        "Demande enregistrée",
+        "Votre demande de certificat de mariage a été envoyée avec succès."
+      );
+    } catch (error: any) {
+      console.log(error);
+
+      Alert.alert(
+        "Erreur",
+        error.message
+      );
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : "height"
+        }>
+        <View style={styles.container}>
       <StatusBar
         backgroundColor="#0E693D"
         barStyle="light-content"
@@ -284,6 +358,7 @@ export default function MariageScreen() {
         <View style={{ height: 30 }} />
       </ScrollView>
     </View>
+  </KeyboardAvoidingView>
   );
 }
 

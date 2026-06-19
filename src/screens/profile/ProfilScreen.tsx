@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,81 @@ import {
   StyleSheet,
   ScrollView,
   StatusBar,
+  Image,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function ProfilScreen() {
+export default function ProfilScreen({ navigation }: any) {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) return;
+
+      const response = await fetch(
+        "http://192.168.1.8:3000/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("PROFILE RESPONSE:", data);
+      setUser(data.user || data.data || data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+useEffect(() => {
+  console.log("PHOTO UPDATED:", user?.photo);
+}, [user]);
+
+const getPhoto = () => {
+  if (!user?.photo) return "https://via.placeholder.com/150";
+
+  if (user.photo.startsWith("http")) return user.photo;
+
+  if (user.photo.startsWith("uploads/")) {
+    return `http://192.168.1.8:3000/${user.photo}`;
+  }
+
+  return `http://192.168.1.8:3000/uploads/${user.photo}`;
+};
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("token");
+    navigation.navigate("Login");
+  };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Chargement...</Text>
+      </View>
+    );
+  }
+
+  if (!user) {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Aucune donnée utilisateur</Text>
+    </View>
+  );
+}
+
   return (
     <ScrollView
       style={styles.container}
@@ -23,38 +94,27 @@ export default function ProfilScreen() {
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <MaterialIcons
-            name="person"
-            size={55}
-            color="#0E693D"
-          />
+          <Image
+             source={{ uri: getPhoto() }}
+             style={{ width: 120, height: 120, borderRadius: 60 }}
+           />
         </View>
 
         <Text style={styles.name}>
-          Utilisateur
+          {user?.fullName}
         </Text>
 
         <Text style={styles.email}>
-          Informations disponibles après connexion
+          {user?.email ?? "utilisateur"}
         </Text>
-      </View>
 
-      {/* STATISTIQUES */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>0</Text>
-          <Text style={styles.statLabel}>Demandes</Text>
-        </View>
+        <Text style={styles.info}>
+          {user?.adresse ?? "Adresse"}
+        </Text>
 
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>0</Text>
-          <Text style={styles.statLabel}>En cours</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>0</Text>
-          <Text style={styles.statLabel}>Validées</Text>
-        </View>
+        <Text style={styles.info}>
+          {user?.numeroCni ?? "Numéro CNI"}
+        </Text>
       </View>
 
       {/* MENU */}
@@ -63,36 +123,28 @@ export default function ProfilScreen() {
           icon="badge"
           title="Mes informations"
           subtitle="Consulter vos informations personnelles"
+          onPress={() => navigation.navigate("MesInformations", {user})}
         />
 
         <MenuItem
           icon="edit"
           title="Modifier le profil"
           subtitle="Mettre à jour vos informations"
-        />
-
-        <MenuItem
-          icon="description"
-          title="Mes demandes"
-          subtitle="Suivre vos démarches administratives"
-        />
-
-        <MenuItem
-          icon="notifications"
-          title="Notifications"
-          subtitle="Consulter les dernières notifications"
+          onPress={() => navigation.navigate("EditProfil", {user})}
         />
 
         <MenuItem
           icon="settings"
           title="Paramètres"
           subtitle="Préférences de l'application"
+          onPress={() => navigation.navigate("Parametres")}
         />
 
         <MenuItem
           icon="support-agent"
           title="Aide & Support"
           subtitle="Contacter l'assistance"
+          onPress={() => navigation.navigate("AideSupport")}
         />
       </View>
 
@@ -108,7 +160,7 @@ export default function ProfilScreen() {
       </View>
 
       {/* DECONNEXION */}
-      <TouchableOpacity style={styles.logoutButton}>
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
         <MaterialIcons
           name="logout"
           size={22}
@@ -127,13 +179,15 @@ function MenuItem({
   icon,
   title,
   subtitle,
+  onPress,
 }: {
   icon: any;
   title: string;
   subtitle: string;
+  onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.menuItem}>
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
       <View style={styles.iconWrapper}>
         <MaterialIcons
           name={icon}
@@ -193,6 +247,12 @@ const styles = StyleSheet.create({
   },
 
   email: {
+    marginTop: 5,
+    color: "#D1FAE5",
+    fontSize: 14,
+  },
+
+  info: {
     marginTop: 5,
     color: "#D1FAE5",
     fontSize: 14,

@@ -9,6 +9,8 @@ import {
   Alert,
   Image,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -80,6 +82,15 @@ export default function OccupationScreen() {
   };
 
   return (
+    <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : "height"
+        }
+      >
+
     <View style={styles.container}>
       <StatusBar
         backgroundColor="#0E693D"
@@ -187,7 +198,7 @@ export default function OccupationScreen() {
         <TouchableOpacity
           style={styles.uploadBox}
           onPress={() => pickImage("photo")}
-        >
+          >
           {photoLieu ? (
             <Image
               source={{ uri: photoLieu }}
@@ -199,7 +210,7 @@ export default function OccupationScreen() {
                 name="photo-camera"
                 size={45}
                 color="#0E693D"
-              />
+                />
               <Text style={styles.uploadText}>
                 Ajouter une photo
               </Text>
@@ -237,7 +248,7 @@ export default function OccupationScreen() {
         <TouchableOpacity
           style={styles.button}
           onPress={handleSubmit}
-        >
+          >
           <MaterialIcons
             name="send"
             size={20}
@@ -252,6 +263,7 @@ export default function OccupationScreen() {
         <View style={{ height: 30 }} />
       </ScrollView>
     </View>
+    </KeyboardAvoidingView>
   );
 }
 

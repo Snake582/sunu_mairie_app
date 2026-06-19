@@ -8,6 +8,11 @@ import MariageScreen from "../screens/demande/MariageScreen";
 import DecesScreen from "../screens/demande/DecesScreen";
 import OccupationScreen from "../screens/demande/OccupationScreen";
 import SignalScreen from "../screens/demande/SignalScreen";
+import AideSupportScreen from "../screens/profile/AideSupportScreen";
+import ParametresScreen from "../screens/profile/ParametresScreen";
+import EditProfilScreen from "../screens/profile/EditProfilScreen";
+import MesInformationsScreen from "../screens/profile/MesInformationsScreen";
+import OnboardingScreen from "../screens/OnboardingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +24,11 @@ export default function AppNavigator() {
           headerShown: false,
         }}
       >
+        <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        />
+        
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -57,6 +67,26 @@ export default function AppNavigator() {
         <Stack.Screen
             name="Occupation"
             component={OccupationScreen}
+        />
+
+        <Stack.Screen
+          name="MesInformations"
+          component={MesInformationsScreen}
+        />
+
+        <Stack.Screen
+          name="EditProfil"
+          component={EditProfilScreen}
+        />
+
+        <Stack.Screen
+          name="Parametres"
+          component={ParametresScreen}
+        />
+
+        <Stack.Screen
+          name="AideSupport"
+          component={AideSupportScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

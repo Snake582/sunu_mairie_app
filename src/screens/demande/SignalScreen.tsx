@@ -8,14 +8,102 @@ import {
   ScrollView,
   Image,
   StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignalScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [location, setLocation] = useState<any>(null);
+  const [typeProbleme, setTypeProbleme] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [description, setDescription] = useState("");
+
+const handleSubmit = async () => {
+  if (
+    !typeProbleme ||
+    !adresse ||
+    !telephone ||
+    !description
+  ) {
+    Alert.alert(
+      "Champs obligatoires",
+      "Veuillez remplir tous les champs requis."
+    );
+    return;
+  }
+
+  try {
+    const token =
+      await AsyncStorage.getItem("token");
+
+    const response = await fetch(
+      "http://192.168.1.8:3000/requests",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: "signalement",
+          data: {
+            typeProbleme,
+            adresse,
+            telephone,
+            description,
+            image,
+            latitude:
+              location?.latitude,
+            longitude:
+              location?.longitude,
+          },
+        }),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "REQUEST RESPONSE :",
+      data
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        Array.isArray(data.message)
+          ? data.message.join(", ")
+          : data.message
+      );
+    }
+
+    Alert.alert(
+      "Succès",
+      "Signalement envoyé avec succès."
+    );
+
+    setTypeProbleme("");
+    setAdresse("");
+    setTelephone("");
+    setDescription("");
+    setImage(null);
+  } catch (error: any) {
+    console.log(error);
+
+    Alert.alert(
+      "Erreur",
+      error.message
+    );
+  }
+};
 
   const handleTakePhoto = async () => {
   const permission =
@@ -76,6 +164,14 @@ const getCurrentLocation = async () => {
 };
 
   return (
+    <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : "height"
+        }>
+          
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
@@ -152,6 +248,8 @@ const getCurrentLocation = async () => {
         <TextInput
           placeholder="Ex : Route dégradée, éclairage public..."
           style={styles.input}
+          value={typeProbleme}
+          onChangeText={setTypeProbleme}
         />
         {location && (
           <View style={styles.locationCard}>
@@ -189,6 +287,8 @@ const getCurrentLocation = async () => {
         <TextInput
           placeholder="Adresse ou quartier"
           style={styles.input}
+          value={adresse}
+          onChangeText={setAdresse}
         />
 
         <Text style={styles.label}>
@@ -199,6 +299,8 @@ const getCurrentLocation = async () => {
           placeholder="+221 XX XXX XX XX"
           keyboardType="phone-pad"
           style={styles.input}
+          value={telephone}
+          onChangeText={setTelephone}
         />
 
         <Text style={styles.label}>
@@ -211,9 +313,12 @@ const getCurrentLocation = async () => {
           numberOfLines={5}
           textAlignVertical="top"
           style={styles.textArea}
+          value={description}
+          onChangeText={setDescription}
         />
 
-        <TouchableOpacity style={styles.submitButton}>
+        <TouchableOpacity style={styles.submitButton}
+        onPress={handleSubmit}>
           <MaterialIcons
             name="campaign"
             size={22}
@@ -226,6 +331,7 @@ const getCurrentLocation = async () => {
         </TouchableOpacity>
       </View>
     </ScrollView>
+</KeyboardAvoidingView>
   );
 }
 
