@@ -7,8 +7,11 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const services = [
   {
@@ -44,8 +47,14 @@ const services = [
 ];
 
 export default function HomeScreen({ navigation }: any) {
+    const insets = useSafeAreaInsets();
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        paddingBottom: insets.bottom + 80,
+      }}
+    >
       {/* LOGO */}
       <Image
         source={require("../../../assets/logo-removebg-preview.png")}

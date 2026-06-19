@@ -46,8 +46,9 @@ const handleRegister = async () => {
       imageUrl = uploadResult.imageUrl;
     }
 
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const response = await fetch(
-      "http://192.168.1.8:3000/users/register",
+      `{API_URL}/users/register`,
       {
         method: "POST",
         headers: {

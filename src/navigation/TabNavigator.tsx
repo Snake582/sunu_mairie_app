@@ -14,8 +14,10 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-
         tabBarShowLabel: false,
+
+        // Cache le tab quand le clavier est ouvert
+        tabBarHideOnKeyboard: true,
 
         tabBarStyle: {
           position: "absolute",
@@ -23,6 +25,7 @@ export default function TabNavigator() {
           left: 15,
           right: 15,
           height: 75,
+
           borderRadius: 25,
           backgroundColor: "#FFF",
           borderTopWidth: 0,
@@ -38,7 +41,11 @@ export default function TabNavigator() {
         },
 
         tabBarIcon: ({ focused }) => {
-          let iconName: any;
+          let iconName:
+            | "home"
+            | "document-text"
+            | "notifications"
+            | "person" = "home";
 
           switch (route.name) {
             case "Accueil":

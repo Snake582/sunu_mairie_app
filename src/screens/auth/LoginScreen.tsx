@@ -27,8 +27,9 @@ export default function LoginScreen({ navigation }: any) {
   }
 
   try {
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const response = await fetch(
-      "http://192.168.1.8:3000/auth/login",
+      `{API_URL}/auth/login`,
       {
         method: "POST",
         headers: {
@@ -113,6 +114,7 @@ export default function LoginScreen({ navigation }: any) {
           />
 
           <TouchableOpacity>
+            onPress={() => navigation.navigate("ForgotPassword")}
             <Text style={styles.forgotPassword}>
               Mot de passe oublié ?
             </Text>

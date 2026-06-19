@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function OccupationScreen() {
   const [prenom, setPrenom] = useState("");
@@ -58,7 +59,7 @@ export default function OccupationScreen() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !prenom ||
       !nom ||
@@ -75,10 +76,66 @@ export default function OccupationScreen() {
       return;
     }
 
+    try {
+          const token = await AsyncStorage.getItem("token");
+    
+          const API_URL = process.env.EXPO_PUBLIC_API_URL;
+          const response = await fetch(
+            `{API_URL}/requests`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                type: "mariage",
+                data: {
+                  prenom,
+                  nom,
+                  typeOccupation,
+                  lieuOccupation,
+                  dateDebut,
+                  dateFin,
+                  pieceIdentite,
+                  telephone,
+                },
+              }),
+            }
+          );
+    
+          const data = await response.json();
+    
+          console.log("REQUEST RESPONSE :", data);
+    
+          if (!response.ok) {
+            throw new Error(
+              Array.isArray(data.message)
+                ? data.message.join(", ")
+                : data.message
+            );
+          }
+    
+          setPrenom("");
+          setNom("");
+          setTypeOccupation("");
+          setLieuOccupation("");
+          setDateDebut("");
+          setDateFin("");
+          setPieceIdentite("");
+          setTelephone("");
+    
+          Alert.alert(
+            "Demande enregistrée",
+            "Votre demande de certificat de mariage a été envoyée avec succès."
+          );
+        } catch (error: any) {
+          console.log(error);
     Alert.alert(
       "Demande enregistrée",
       "Votre demande d'autorisation d'occupation a été envoyée avec succès."
     );
+  }
   };
 
   return (
