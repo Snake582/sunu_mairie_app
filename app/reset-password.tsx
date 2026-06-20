@@ -1,3 +1,4 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   View,
@@ -17,11 +18,9 @@ import {
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export default function ResetPasswordScreen({
-  route,
-  navigation,
-}: any) {
-  const { email, token } = route.params || {};
+export default function ResetPasswordScreen() {
+  const router = useRouter();
+  const { email, token } = useLocalSearchParams<{ email: string; token: string }>();
 
   const [code, setCode] = useState(token ?? "");
   const [password, setPassword] = useState("");
@@ -68,11 +67,11 @@ export default function ResetPasswordScreen({
 
       Alert.alert(
         "Succès",
-        data.message || "Votre mot de passe a été réinitialisé.",
+        data.message || "Votre mot de passe a été réinitialis.",
         [
           {
             text: "Se connecter",
-            onPress: () => navigation.replace("Login"),
+            onPress: () => router.replace("/login"),
           },
         ]
       );
@@ -98,7 +97,7 @@ export default function ResetPasswordScreen({
           showsVerticalScrollIndicator={false}
         >
           <Image
-            source={require("../../assets/logo-removebg-preview.png")}
+            source={require("~/assets/logo-removebg-preview.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -156,7 +155,7 @@ export default function ResetPasswordScreen({
             </TouchableOpacity>
           </View>
 
-          <Pressable onPress={() => navigation.navigate("Login")}>
+          <Pressable onPress={() => router.navigate("/login")}>
             <Text style={styles.backText}>Retour à la connexion</Text>
           </Pressable>
         </ScrollView>

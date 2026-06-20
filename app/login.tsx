@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
 	View,
@@ -14,7 +15,8 @@ import {
 	Pressable,
 } from "react-native";
 
-export default function LoginScreen({ navigation }: any) {
+export default function LoginScreen() {
+	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -49,7 +51,7 @@ export default function LoginScreen({ navigation }: any) {
 
 			Alert.alert("Succès", "Connexion réussie");
 
-			navigation.replace("Main");
+			router.replace("/");
 		} catch (error: any) {
 			Alert.alert("Erreur", error.message || "Connexion impossible");
 		}
@@ -62,7 +64,7 @@ export default function LoginScreen({ navigation }: any) {
 			>
 				{/* Logo */}
 				<Image
-					source={require("../../../assets/logo-removebg-preview.png")}
+					source={require("~/assets/logo-removebg-preview.png")}
 					style={styles.logo}
 					resizeMode="contain"
 				/>
@@ -98,7 +100,7 @@ export default function LoginScreen({ navigation }: any) {
 						onChangeText={setPassword}
 					/>
 
-					<Pressable onPress={() => navigation.navigate("ForgotPassword")}>
+					<Pressable onPress={() => router.navigate("/forgot-password")}>
 						<Text style={styles.forgotPassword}>Mot de passe oublié ?</Text>
 					</Pressable>
 
@@ -111,7 +113,7 @@ export default function LoginScreen({ navigation }: any) {
 				<View style={styles.footer}>
 					<Text style={styles.footerText}>Vous n'avez pas de compte ?</Text>
 
-					<TouchableOpacity onPress={() => navigation.navigate("Register")}>
+					<TouchableOpacity onPress={() => router.navigate("/register")}>
 						<Text style={styles.registerText}>Créer un compte</Text>
 					</TouchableOpacity>
 				</View>

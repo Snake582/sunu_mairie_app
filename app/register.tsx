@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
 	View,
@@ -13,7 +14,8 @@ import {
 	Alert,
 } from "react-native";
 
-export default function RegisterScreen({ navigation }: any) {
+export default function RegisterScreen() {
+	const router = useRouter();
 	const [fullName, setFullName] = useState("");
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
@@ -27,14 +29,6 @@ export default function RegisterScreen({ navigation }: any) {
 				Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires");
 				return;
 			}
-
-			let imageUrl = "";
-
-			// // Upload photo si sélectionnée
-			// if (photo) {
-			// 	const uploadResult = await uploadImage();
-			// 	imageUrl = uploadResult.imageUrl;
-			// }
 
 			const API_URL = process.env.EXPO_PUBLIC_API_URL;
 			const response = await fetch(`${API_URL}/users/register`, {
@@ -62,56 +56,11 @@ export default function RegisterScreen({ navigation }: any) {
 
 			Alert.alert("Succès", "Compte créé avec succès");
 
-			navigation.navigate("Login");
+			router.navigate("/login");
 		} catch (error: any) {
 			Alert.alert("Erreur", error.message || "Une erreur est survenue");
 		}
 	};
-
-	// const uploadImage = async () => {
-	// 	const formData = new FormData();
-
-	// 	formData.append("photo", {
-	// 		uri: photo,
-	// 		name: "profile.jpg",
-	// 		type: "image/jpeg",
-	// 	} as any);
-
-	// 	const API_URL = process.env.EXPO_PUBLIC_API_URL;
-	// 	const response = await fetch(`${API_URL}/users/upload`, {
-	// 		method: "POST",
-	// 		body: formData,
-	// 	});
-
-	// 	if (!response.ok) {
-	// 		throw new Error("Erreur lors de l'upload de la photo");
-	// 	}
-
-	// 	return await response.json();
-	// };
-
-	// TODO: leave it in the profile page
-	// const pickImage = async () => {
-	// 	const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-	// 	if (!permission.granted) {
-	// 		Alert.alert(
-	// 			"Permission refusée",
-	// 			"Veuillez autoriser l'accès à la galerie",
-	// 		);
-	// 		return;
-	// 	}
-
-	// 	const result = await ImagePicker.launchImageLibraryAsync({
-	// 		mediaTypes: ImagePicker.MediaTypeOptions.Images,
-	// 		allowsEditing: true,
-	// 		quality: 0.8,
-	// 	});
-
-	// 	if (!result.canceled) {
-	// 		setPhoto(result.assets[0].uri);
-	// 	}
-	// };
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -124,7 +73,7 @@ export default function RegisterScreen({ navigation }: any) {
 					showsVerticalScrollIndicator={false}
 				>
 					<Image
-						source={require("../../../assets/logo-removebg-preview.png")}
+						source={require("~/assets/logo-removebg-preview.png")}
 						style={styles.logo}
 						resizeMode="contain"
 					/>
@@ -151,10 +100,10 @@ export default function RegisterScreen({ navigation }: any) {
 						<TextInput
 							placeholder="exemple@email.com"
 							keyboardType="email-address"
-              placeholderTextColor="#94A3B8"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="email"
+							placeholderTextColor="#94A3B8"
+							autoCapitalize="none"
+							autoCorrect={false}
+							autoComplete="email"
 							style={styles.input}
 							value={email}
 							onChangeText={setEmail}
@@ -173,8 +122,8 @@ export default function RegisterScreen({ navigation }: any) {
 						<Text style={styles.label}>Mot de passe</Text>
 						<TextInput
 							placeholder="mot de passe"
-              secureTextEntry
-              autoCapitalize="none"
+							secureTextEntry
+							autoCapitalize="none"
 							placeholderTextColor="#94A3B8"
 							style={styles.input}
 							value={password}
@@ -184,8 +133,8 @@ export default function RegisterScreen({ navigation }: any) {
 						<Text style={styles.label}>Adresse</Text>
 						<TextInput
 							placeholder="Votre adresse"
-              placeholderTextColor="#94A3B8"
-              autoComplete="address-line1"
+							placeholderTextColor="#94A3B8"
+							autoComplete="address-line1"
 							style={styles.input}
 							value={adresse}
 							onChangeText={setAdresse}
@@ -201,32 +150,6 @@ export default function RegisterScreen({ navigation }: any) {
 							onChangeText={setNumeroCni}
 						/>
 
-						{/*<TouchableOpacity onPress={pickImage}>
-							<Text
-								style={{
-									textAlign: "center",
-									color: "#0E693D",
-									marginBottom: 10,
-									fontWeight: "600",
-								}}
-							>
-								Choisir une photo
-							</Text>
-						</TouchableOpacity>
-
-						{photo && (
-							<Image
-								source={{ uri: photo }}
-								style={{
-									width: 100,
-									height: 100,
-									borderRadius: 50,
-									alignSelf: "center",
-									marginBottom: 15,
-								}}
-							/>
-						)}*/}
-
 						<TouchableOpacity style={styles.button} onPress={handleRegister}>
 							<Text style={styles.buttonText}>Créer mon compte</Text>
 						</TouchableOpacity>
@@ -235,7 +158,7 @@ export default function RegisterScreen({ navigation }: any) {
 					<View style={styles.footer}>
 						<Text style={styles.footerText}>Vous avez déjà un compte ?</Text>
 
-						<TouchableOpacity onPress={() => navigation.navigate("Login")}>
+						<TouchableOpacity onPress={() => router.navigate("/login")}>
 							<Text style={styles.loginText}>Se connecter</Text>
 						</TouchableOpacity>
 					</View>

@@ -31,10 +31,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	name: getAppName(),
 	slug: "sunu-mairie",
 	version: "1.0.0",
+	scheme: "sunu-mairie",
 	orientation: "portrait",
 	icon: "./assets/icon.jpeg",
 	userInterfaceStyle: "light",
-	newArchEnabled: false,
+	assetBundlePatterns: ["**/*"],
+	experiments: {
+		reactCompiler: true,
+	},
 	ios: {
 		supportsTablet: true,
 		bundleIdentifier: getUniqueIdentifier(),
@@ -59,6 +63,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		favicon: "./assets/favicon.png",
 	},
 	plugins: [
+		"expo-router",
+		"expo-font",
+		"expo-status-bar",
 		[
 			"expo-splash-screen",
 			{

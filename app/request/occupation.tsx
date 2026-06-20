@@ -1,3 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
 	View,
@@ -12,11 +15,10 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
-export default function OccupationScreen({ navigation }: any) {
+export default function OccupationScreen() {
+	const router = useRouter();
 	const [prenom, setPrenom] = useState("");
 	const [nom, setNom] = useState("");
 	const [telephone, setTelephone] = useState("");
@@ -122,9 +124,9 @@ export default function OccupationScreen({ navigation }: any) {
 				[
 					{
 						text: "OK",
-						onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+						onPress: () => router.navigate("/demandes"),
 					},
-				]
+				],
 			);
 		} catch (error: any) {
 			console.log(error);
@@ -156,7 +158,7 @@ export default function OccupationScreen({ navigation }: any) {
 					showsVerticalScrollIndicator={false}
 				>
 					<View style={styles.infoCard}>
-						<MaterialIcons name="info" size={22} color="#0E693D" />
+						<IconSymbol name="info" size={22} color="#0E693D" />
 
 						<Text style={styles.infoText}>
 							Fournissez des informations précises afin de faciliter le
@@ -237,7 +239,7 @@ export default function OccupationScreen({ navigation }: any) {
 							<Image source={{ uri: photoLieu }} style={styles.preview} />
 						) : (
 							<>
-								<MaterialIcons name="photo-camera" size={45} color="#0E693D" />
+								<IconSymbol name="photo-camera" size={45} color="#0E693D" />
 								<Text style={styles.uploadText}>Ajouter une photo</Text>
 							</>
 						)}
@@ -253,7 +255,7 @@ export default function OccupationScreen({ navigation }: any) {
 							<Image source={{ uri: pieceIdentite }} style={styles.preview} />
 						) : (
 							<>
-								<MaterialIcons name="badge" size={45} color="#0E693D" />
+								<IconSymbol name="badge" size={45} color="#0E693D" />
 								<Text style={styles.uploadText}>
 									Ajouter votre pièce d'identité
 								</Text>
@@ -262,7 +264,7 @@ export default function OccupationScreen({ navigation }: any) {
 					</TouchableOpacity>
 
 					<TouchableOpacity style={styles.button} onPress={handleSubmit}>
-						<MaterialIcons name="send" size={20} color="#FFF" />
+						<IconSymbol name="send" size={20} color="#FFF" />
 
 						<Text style={styles.buttonText}>Envoyer la demande</Text>
 					</TouchableOpacity>

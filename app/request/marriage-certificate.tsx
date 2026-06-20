@@ -1,3 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   View,
@@ -12,11 +15,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
-export default function MariageScreen({ navigation }: any) {
+export default function MarriageCertificateScreen() {
+  const router = useRouter();
   const [prenomEpoux, setPrenomEpoux] = useState("");
   const [nomEpoux, setNomEpoux] = useState("");
 
@@ -142,7 +144,7 @@ export default function MariageScreen({ navigation }: any) {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+            onPress: () => router.navigate("/demandes"),
           },
         ]
       );
@@ -185,7 +187,7 @@ export default function MariageScreen({ navigation }: any) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.infoCard}>
-          <MaterialIcons
+          <IconSymbol
             name="info"
             size={22}
             color="#0E693D"
@@ -289,7 +291,7 @@ export default function MariageScreen({ navigation }: any) {
             />
           ) : (
             <>
-              <MaterialIcons
+              <IconSymbol
                 name="upload-file"
                 size={45}
                 color="#0E693D"
@@ -319,7 +321,7 @@ export default function MariageScreen({ navigation }: any) {
             />
           ) : (
             <>
-              <MaterialIcons
+              <IconSymbol
                 name="badge"
                 size={45}
                 color="#0E693D"
@@ -351,7 +353,7 @@ export default function MariageScreen({ navigation }: any) {
           style={styles.button}
           onPress={handleSubmit}
         >
-          <MaterialIcons
+          <IconSymbol
             name="send"
             size={20}
             color="#FFF"
