@@ -40,20 +40,44 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
+    ios: {
+		supportsTablet: true,
+		bundleIdentifier: getUniqueIdentifier(),
+		config: {
+			usesNonExemptEncryption: false,
+		},
+		icon: {
+			dark: "./assets/icons/ios-icon-dark.png",
+			light: "./assets/icons/ios-icon-default.png",
+			tinted: "./assets/icons/ios-icon-monochrome.png",
+		},
+	},
+	android: {
+			adaptiveIcon: {
+				foregroundImage: "./assets/icons/android-icon-foreground.png",
+				monochromeImage: "./assets/icons/android-icon-monochrome.png",
+				backgroundColor: "#FFFFFF",
+			},
+			package: getUniqueIdentifier(),
+		},
     "web": {
       "favicon": "./assets/favicon.png"
-    },
+  },
+  plugins: [
+		[
+			"expo-splash-screen",
+			{
+        backgroundColor: "#FFFFFF",
+        ios: {
+          image: "./assets/icons/iOS.png",
+        },
+        android: {
+          image: "./assets/icons/android-splash.png",
+				},
+				imageWidth: 200,
+			},
+		]
+	],
     "extra": {
       "eas": {
         "projectId": "201544b1-2016-4f6f-a923-22e97a78b579"

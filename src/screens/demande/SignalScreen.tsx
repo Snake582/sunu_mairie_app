@@ -17,7 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function SignalScreen() {
+export default function SignalScreen({ navigation }: any) {
   const [image, setImage] = useState<string | null>(null);
   const [location, setLocation] = useState<any>(null);
   const [typeProbleme, setTypeProbleme] = useState("");
@@ -43,8 +43,9 @@ const handleSubmit = async () => {
     const token =
       await AsyncStorage.getItem("token");
 
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const response = await fetch(
-      "http://192.168.1.8:3000/requests",
+      `${API_URL}/requests`,
       {
         method: "POST",
         headers: {
@@ -87,7 +88,13 @@ const handleSubmit = async () => {
 
     Alert.alert(
       "Succès",
-      "Signalement envoyé avec succès."
+      "Signalement envoyé avec succès.",
+      [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+        },
+      ]
     );
 
     setTypeProbleme("");

@@ -50,8 +50,9 @@ export default function EditProfilScreen({
       } as any
     );
 
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const response = await fetch(
-      "http://192.168.1.8:3000/users/upload",
+      `${API_URL}/users/upload`,
       {
         method: "POST",
         body: formData,
@@ -109,8 +110,9 @@ export default function EditProfilScreen({
           uploadResult.imageUrl;
       }
 
+      const API_URL = process.env.EXPO_PUBLIC_API_URL;
       const response = await fetch(
-        `http://192.168.1.8:3000/users/${user.id}`,
+        `${API_URL}/users/${user.id}`,
         {
           method: "PATCH",
           headers: {

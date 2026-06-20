@@ -24,8 +24,9 @@ export default function DemandesScreen() {
     try {
       const token = await AsyncStorage.getItem("token");
 
+      const API_URL = process.env.EXPO_PUBLIC_API_URL;
       const response = await fetch(
-        "http://192.168.1.8:3000/requests/my-requests",
+        `${API_URL}/requests/my-requests`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
