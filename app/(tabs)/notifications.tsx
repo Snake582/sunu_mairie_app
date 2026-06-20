@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
 const notifications = [
   {
@@ -40,25 +40,25 @@ const getNotificationConfig = (type: string) => {
   switch (type) {
     case "success":
       return {
-        icon: "notifications-active",
+        icon: "notifications-active" as const,
         color: "#F59E0B",
       };
 
     case "validated":
       return {
-        icon: "check-circle",
+        icon: "check-circle" as const,
         color: "#22C55E",
       };
 
     case "document":
       return {
-        icon: "description",
+        icon: "description" as const,
         color: "#3B82F6",
       };
 
     default:
       return {
-        icon: "notifications",
+        icon: "notifications" as const,
         color: "#9CA3AF",
       };
   }
@@ -89,7 +89,7 @@ export default function NotificationsScreen() {
         </View>
 
         <TouchableOpacity style={styles.markAllButton}>
-          <MaterialIcons
+          <IconSymbol
             name="done-all"
             size={20}
             color="#0E693D"
@@ -122,8 +122,8 @@ export default function NotificationsScreen() {
                   },
                 ]}
               >
-                <MaterialIcons
-                  name={config.icon as any}
+                <IconSymbol
+                  name={config.icon}
                   size={28}
                   color={config.color}
                 />

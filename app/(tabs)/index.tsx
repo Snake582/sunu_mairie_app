@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   View,
@@ -7,49 +8,49 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
 const services = [
   {
     id: "1",
     title: "Acte de naissance",
-    icon: "description",
-    screen: "ActeNaissance",
+    icon: "description" as const,
+    href: "/request/birth-certificate" as const,
   },
   {
     id: "2",
     title: "Signalement",
-    icon: "report",
-    screen: "Signal",
+    icon: "report" as const,
+    href: "/request/report" as const,
   },
   {
     id: "3",
     title: "Certificat de mariage",
-    icon: "favorite",
-    screen: "Mariage",
+    icon: "favorite" as const,
+    href: "/request/marriage-certificate" as const,
   },
   {
     id: "4",
     title: "Certificat de décès",
-    icon: "article",
-    screen: "Deces",
+    icon: "article" as const,
+    href: "/request/death-certificate" as const,
   },
   {
     id: "5",
     title: "Occupation",
-    icon: "place",
-    screen: "Occupation",
+    icon: "place" as const,
+    href: "/request/occupation" as const,
   },
 ];
 
-export default function HomeScreen({ navigation }: any) {
-    const insets = useSafeAreaInsets();
+export default function HomeScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
   return (
-        <ScrollView
+    <ScrollView
       style={styles.container}
       contentContainerStyle={{
         paddingBottom: insets.bottom + 80,
@@ -57,7 +58,7 @@ export default function HomeScreen({ navigation }: any) {
     >
       {/* LOGO */}
       <Image
-        source={require("../../../assets/logo-removebg-preview.png")}
+        source={require("~/assets/logo-removebg-preview.png")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -81,7 +82,7 @@ export default function HomeScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.bannerButton}
-          onPress={() => navigation.navigate("Demandes")}
+          onPress={() => router.navigate("/demandes")}
         >
           <Text style={styles.bannerButtonText}>
             Voir mes demandes
@@ -106,10 +107,10 @@ export default function HomeScreen({ navigation }: any) {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.serviceCard}
-            onPress={() => navigation.navigate(item.screen)}
+            onPress={() => router.navigate(item.href)}
           >
-            <MaterialIcons
-              name={item.icon as any}
+            <IconSymbol
+              name={item.icon}
               size={40}
               color="#0E693D"
             />

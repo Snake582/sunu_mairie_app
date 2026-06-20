@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   View,
@@ -11,10 +13,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
-export default function ActeNaissanceScreen({ navigation }: any) {
+export default function BirthCertificateScreen() {
+  const router = useRouter();
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [dateNaissance, setDateNaissance] = useState("");
@@ -67,13 +69,13 @@ export default function ActeNaissanceScreen({ navigation }: any) {
 
       const data = await response.json();
 
-console.log("REQUEST RESPONSE :", data);
+      console.log("REQUEST RESPONSE :", data);
 
-if (!response.ok) {
-  throw new Error(
-    data.message || "Erreur inconnue"
-  );
-}
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Erreur inconnue"
+        );
+      }
 
       Alert.alert(
         "Demande enregistrée",
@@ -81,18 +83,18 @@ if (!response.ok) {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("Main", { screen: "Demandes" }),
+            onPress: () => router.navigate("/demandes"),
           },
         ]
       );
     } catch (error: any) {
-  console.log(error);
+      console.log(error);
 
-  Alert.alert(
-    "Erreur",
-    error.message
-  );
-}
+      Alert.alert(
+        "Erreur",
+        error.message
+      );
+    }
   };
 
   return (
@@ -129,7 +131,7 @@ if (!response.ok) {
       >
         {/* INFO */}
         <View style={styles.infoCard}>
-          <MaterialIcons
+          <IconSymbol
             name="info"
             size={22}
             color="#0E693D"
@@ -225,7 +227,7 @@ if (!response.ok) {
           style={styles.button}
           onPress={handleSubmit}
         >
-          <MaterialIcons
+          <IconSymbol
             name="send"
             size={20}
             color="#FFF"

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,9 +9,7 @@ import {
   StatusBar,
   ActivityIndicator,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-// import axios from "axios";
+import { IconSymbol } from "~/components/ui/IconSymbol";
 
 export default function DemandesScreen() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -61,35 +60,35 @@ export default function DemandesScreen() {
       case "pending":
         return {
           color: "#F59E0B",
-          icon: "schedule",
+          icon: "schedule" as const,
           label: "En attente",
         };
 
       case "approved":
         return {
           color: "#22C55E",
-          icon: "check-circle",
+          icon: "check-circle" as const,
           label: "Validée",
         };
 
       case "ready":
         return {
           color: "#3B82F6",
-          icon: "inventory",
+          icon: "inventory" as const,
           label: "Prête",
         };
 
       case "rejected":
         return {
           color: "#EF4444",
-          icon: "cancel",
+          icon: "cancel" as const,
           label: "Rejetée",
         };
 
       default:
         return {
           color: "#94A3B8",
-          icon: "help",
+          icon: "help" as const,
           label: status,
         };
     }
@@ -157,7 +156,7 @@ export default function DemandesScreen() {
         </View>
       ) : requests.length === 0 ? (
         <View style={styles.center}>
-          <MaterialIcons
+          <IconSymbol
             name="folder-open"
             size={80}
             color="#CBD5E1"
@@ -197,8 +196,8 @@ export default function DemandesScreen() {
                     },
                   ]}
                 >
-                  <MaterialIcons
-                    name={config.icon as any}
+                  <IconSymbol
+                    name={config.icon}
                     size={30}
                     color={config.color}
                   />
@@ -236,7 +235,7 @@ export default function DemandesScreen() {
                   </View>
                 </View>
 
-                <MaterialIcons
+                <IconSymbol
                   name="chevron-right"
                   size={24}
                   color="#94A3B8"

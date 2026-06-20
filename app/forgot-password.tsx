@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   View,
@@ -17,7 +18,8 @@ import {
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export default function ForgotPasswordScreen({ navigation }: any) {
+export default function ForgotPasswordScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +57,10 @@ export default function ForgotPasswordScreen({ navigation }: any) {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("ResetPassword", { email, token: data.token }),
+            onPress: () => router.navigate({
+              pathname: "/reset-password",
+              params: { email, token: data.token },
+            }),
           },
         ]
       );
@@ -78,7 +83,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
           showsVerticalScrollIndicator={false}
         >
           <Image
-            source={require("../../assets/logo-removebg-preview.png")}
+            source={require("~/assets/logo-removebg-preview.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -116,7 +121,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
             </TouchableOpacity>
           </View>
 
-          <Pressable onPress={() => navigation.navigate("Login")}>
+          <Pressable onPress={() => router.navigate("/login")}>
             <Text style={styles.backText}>Retour à la connexion</Text>
           </Pressable>
         </ScrollView>
