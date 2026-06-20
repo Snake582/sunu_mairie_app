@@ -42,3 +42,5 @@ yarn-error.*
 assets/screenshots/
 *.log
 *.apk
+.env
+*.ipa

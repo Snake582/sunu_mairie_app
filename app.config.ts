@@ -27,20 +27,15 @@ const getAppName = () => {
 	return "Sunu Mairie";
 };
 export default ({ config }: ConfigContext): ExpoConfig => ({
-  ...config,
-    "name": getAppName(),
-    "slug": "sunu-mairie",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.jpeg",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    ios: {
+	...config,
+	name: getAppName(),
+	slug: "sunu-mairie",
+	version: "1.0.0",
+	orientation: "portrait",
+	icon: "./assets/icon.jpeg",
+	userInterfaceStyle: "light",
+	newArchEnabled: false,
+	ios: {
 		supportsTablet: true,
 		bundleIdentifier: getUniqueIdentifier(),
 		config: {
@@ -53,34 +48,34 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		},
 	},
 	android: {
-			adaptiveIcon: {
-				foregroundImage: "./assets/icons/android-icon-foreground.png",
-				monochromeImage: "./assets/icons/android-icon-monochrome.png",
-				backgroundColor: "#FFFFFF",
-			},
-			package: getUniqueIdentifier(),
+		adaptiveIcon: {
+			foregroundImage: "./assets/icons/android-icon-foreground.png",
+			monochromeImage: "./assets/icons/android-icon-monochrome.png",
+			backgroundColor: "#FFFFFF",
 		},
-    "web": {
-      "favicon": "./assets/favicon.png"
-  },
-  plugins: [
+		package: getUniqueIdentifier(),
+	},
+	web: {
+		favicon: "./assets/favicon.png",
+	},
+	plugins: [
 		[
 			"expo-splash-screen",
 			{
-        backgroundColor: "#FFFFFF",
-        ios: {
-          image: "./assets/icons/iOS.png",
-        },
-        android: {
-          image: "./assets/icons/android-splash.png",
+				backgroundColor: "#FFFFFF",
+				ios: {
+					image: "./assets/icons/iOS.png",
+				},
+				android: {
+					image: "./assets/icons/android-splash.png",
 				},
 				imageWidth: 200,
 			},
-		]
+		],
 	],
-  "extra": {
-    "eas": {
-      "projectId": "8b2293b7-c0d7-46c1-a303-dbe4f2b068db"
-    }
-  }
-})
+	extra: {
+		eas: {
+			projectId: "8b2293b7-c0d7-46c1-a303-dbe4f2b068db",
+		},
+	},
+});
