@@ -24,7 +24,7 @@ export default function ProfileInfoScreen() {
 			<View style={{ flex: 1 }}>
 				<Text style={styles.label}>{label}</Text>
 
-				<Text style={styles.value}>{value || "Non renseigné"}</Text>
+				<Text style={styles.value}>{value || "-"}</Text>
 			</View>
 		</View>
 	);
@@ -39,9 +39,9 @@ export default function ProfileInfoScreen() {
 					style={styles.avatar}
 				/>
 
-				<Text style={styles.name}>{user?.fullName}</Text>
+				<Text style={styles.name}>{user?.fullName || "-"}</Text>
 
-				<Text style={styles.email}>{user?.email}</Text>
+				<Text style={styles.email}>{user?.email || "-"}</Text>
 			</View>
 
 			<View style={styles.content}>

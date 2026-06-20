@@ -68,6 +68,11 @@ export default function EditProfileScreen() {
 
 	const updateProfile = async () => {
 		try {
+			if (!user?.id) {
+				Alert.alert("Erreur", "Aucun utilisateur à modifier");
+				return;
+			}
+
 			setLoading(true);
 
 			let imageUrl = user?.photo;

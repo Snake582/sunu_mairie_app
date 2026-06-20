@@ -16,29 +16,70 @@ export default function ProfilScreen() {
 	const router = useRouter();
 	const [user, setUser] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		loadProfile();
 	}, []);
 
 	const loadProfile = async () => {
+		setLoading(true);
+		setError(null);
+
 		try {
 			const token = await AsyncStorage.getItem("token");
 
-			if (!token) return;
+			if (!token) {
+				setError("Vous n'êtes pas connecté.");
+				return;
+			}
 
 			const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+			if (!API_URL) {
+				setError("Configuration manquante (API_URL).");
+				return;
+			}
+
 			const response = await fetch(`${API_URL}/users/profile`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			});
 
-			const data = await response.json();
-			console.log("PROFILE RESPONSE:", data);
-			setUser(data.user || data.data || data);
-		} catch (error) {
-			console.log(error);
+			let data: any = null;
+			const text = await response.text();
+
+			try {
+				data = text ? JSON.parse(text) : null;
+			} catch {
+				data = null;
+			}
+
+			console.log("PROFILE RESPONSE:", response.status, data);
+
+			if (!response.ok) {
+				if (response.status === 401) {
+					await AsyncStorage.removeItem("token");
+					setError("Session expirée. Veuillez vous reconnecter.");
+					return;
+				}
+
+				setError(data?.message || `Erreur ${response.status}`);
+				return;
+			}
+
+			const userData = data?.user ?? data?.data ?? data;
+
+			if (!userData || typeof userData !== "object") {
+				setError("Aucune donnée utilisateur reçue.");
+				return;
+			}
+
+			setUser(userData);
+		} catch (err: any) {
+			console.log("PROFILE ERROR:", err);
+			setError("Impossible de charger le profil. Vérifiez votre connexion.");
 		} finally {
 			setLoading(false);
 		}
@@ -75,17 +116,31 @@ export default function ProfilScreen() {
 		);
 	}
 
-	if (!user) {
-		return (
-			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-				<Text>Aucune donnée utilisateur</Text>
-			</View>
-		);
-	}
+	const displayName = user?.fullName ?? "-";
+	const displayEmail = user?.email ?? "-";
+	const displayAdresse = user?.adresse ?? "-";
+	const displayCni = user?.numeroCni ?? "-";
+
+	const canEdit = !!user;
 
 	return (
 		<ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 			<StatusBar barStyle="light-content" backgroundColor="#0E693D" />
+
+			{error ? (
+				<View style={styles.errorBanner}>
+					<IconSymbol name="info" size={20} color="#B91C1C" />
+
+					<Text style={styles.errorText}>{error}</Text>
+
+					<TouchableOpacity
+						hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+						onPress={loadProfile}
+					>
+						<Text style={styles.errorRetry}>Réessayer</Text>
+					</TouchableOpacity>
+				</View>
+			) : null}
 
 			{/* HEADER */}
 			<View style={styles.header}>
@@ -96,13 +151,13 @@ export default function ProfilScreen() {
 					/>
 				</View>
 
-				<Text style={styles.name}>{user?.fullName}</Text>
+				<Text style={styles.name}>{displayName}</Text>
 
-				<Text style={styles.email}>{user?.email ?? "utilisateur"}</Text>
+				<Text style={styles.email}>{displayEmail}</Text>
 
-				<Text style={styles.info}>{user?.adresse ?? "Adresse"}</Text>
+				<Text style={styles.info}>{displayAdresse}</Text>
 
-				<Text style={styles.info}>{user?.numeroCni ?? "Numéro CNI"}</Text>
+				<Text style={styles.info}>{displayCni}</Text>
 			</View>
 
 			{/* MENU */}
@@ -111,10 +166,11 @@ export default function ProfilScreen() {
 					icon="badge"
 					title="Mes informations"
 					subtitle="Consulter vos informations personnelles"
+					disabled={!canEdit}
 					onPress={() =>
 						router.navigate({
 							pathname: "/profile/info",
-							params: { user: JSON.stringify(user) },
+							params: { user: JSON.stringify(user ?? {}) },
 						})
 					}
 				/>
@@ -123,10 +179,11 @@ export default function ProfilScreen() {
 					icon="edit"
 					title="Modifier le profil"
 					subtitle="Mettre à jour vos informations"
+					disabled={!canEdit}
 					onPress={() =>
 						router.navigate({
 							pathname: "/profile/edit",
-							params: { user: JSON.stringify(user) },
+							params: { user: JSON.stringify(user ?? {}) },
 						})
 					}
 				/>
@@ -171,26 +228,35 @@ function MenuItem({
 	icon,
 	title,
 	subtitle,
+	disabled,
 	onPress,
 }: {
 	icon: any;
 	title: string;
 	subtitle: string;
+	disabled?: boolean;
 	onPress?: () => void;
 }) {
 	return (
-		<TouchableOpacity style={styles.menuItem} onPress={onPress}>
-			<View style={styles.iconWrapper}>
-				<IconSymbol name={icon} size={22} color="#0E693D" />
+		<TouchableOpacity
+			style={[styles.menuItem, disabled && styles.menuItemDisabled]}
+			onPress={disabled ? undefined : onPress}
+			disabled={disabled}
+			activeOpacity={disabled ? 1 : 0.85}
+		>
+			<View style={[styles.iconWrapper, disabled && styles.iconWrapperDisabled]}>
+				<IconSymbol name={icon} size={22} color={disabled ? "#94A3B8" : "#0E693D"} />
 			</View>
 
 			<View style={{ flex: 1 }}>
-				<Text style={styles.menuTitle}>{title}</Text>
+				<Text style={[styles.menuTitle, disabled && styles.menuTitleDisabled]}>
+					{title}
+				</Text>
 
 				<Text style={styles.menuSubtitle}>{subtitle}</Text>
 			</View>
 
-			<IconSymbol name="chevron-right" size={24} color="#94A3B8" />
+			<IconSymbol name="chevron-right" size={24} color={disabled ? "#CBD5E1" : "#94A3B8"} />
 		</TouchableOpacity>
 	);
 }
@@ -300,6 +366,10 @@ const styles = StyleSheet.create({
 		elevation: 2,
 	},
 
+	menuItemDisabled: {
+		backgroundColor: "#F1F5F9",
+	},
+
 	iconWrapper: {
 		width: 46,
 		height: 46,
@@ -310,10 +380,18 @@ const styles = StyleSheet.create({
 		marginRight: 15,
 	},
 
+	iconWrapperDisabled: {
+		backgroundColor: "#E2E8F0",
+	},
+
 	menuTitle: {
 		fontSize: 15,
 		fontWeight: "600",
 		color: "#1E293B",
+	},
+
+	menuTitleDisabled: {
+		color: "#64748B",
 	},
 
 	menuSubtitle: {
@@ -353,5 +431,71 @@ const styles = StyleSheet.create({
 		fontWeight: "700",
 		marginLeft: 10,
 		fontSize: 15,
+	},
+
+	emptyState: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingHorizontal: 32,
+		backgroundColor: "#F8FAFC",
+	},
+
+	emptyTitle: {
+		marginTop: 16,
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#1E293B",
+		textAlign: "center",
+	},
+
+	emptySubtitle: {
+		marginTop: 8,
+		fontSize: 14,
+		color: "#64748B",
+		textAlign: "center",
+	},
+
+	retryButton: {
+		marginTop: 24,
+		backgroundColor: "#0E693D",
+		paddingVertical: 12,
+		paddingHorizontal: 24,
+		borderRadius: 14,
+	},
+
+	retryText: {
+		color: "#FFF",
+		fontWeight: "600",
+		fontSize: 15,
+	},
+
+	errorBanner: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: "#FEF2F2",
+		marginHorizontal: 20,
+		marginTop: 16,
+		marginBottom: -10,
+		paddingVertical: 12,
+		paddingHorizontal: 16,
+		borderRadius: 16,
+		borderWidth: 1,
+		borderColor: "#FECACA",
+	},
+
+	errorText: {
+		flex: 1,
+		marginLeft: 10,
+		fontSize: 13,
+		color: "#B91C1C",
+		lineHeight: 18,
+	},
+
+	errorRetry: {
+		fontSize: 13,
+		fontWeight: "600",
+		color: "#0E693D",
+		marginLeft: 8,
 	},
 });

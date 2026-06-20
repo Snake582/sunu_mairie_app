@@ -13,6 +13,7 @@ const MAPPING = {
 	"document-text": { ios: "doc.text" as const, android: "description" as const },
 	notifications: { ios: "bell" as const, android: "notifications" as const },
 	person: { ios: "person" as const, android: "person" as const },
+	"person-off": { ios: "person.slash" as const, android: "person_off" as const },
 
 	// Onboarding
 	"document-text-outline": { ios: "doc.text" as const, android: "description" as const },
