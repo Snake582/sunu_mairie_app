@@ -5,14 +5,14 @@ const IS_PREVIEW = process.env.APP_VARIANT === "preview";
 
 const getUniqueIdentifier = () => {
 	if (IS_DEV) {
-		return "com.xarala.sunu-mairie.dev";
+		return "com.xarala.sunumairie.dev";
 	}
 
 	if (IS_PREVIEW) {
-		return "com.xarala.sunu-mairie.preview";
+		return "com.xarala.sunumairie.preview";
 	}
 
-	return "com.xarala.sunu-mairie";
+	return "com.xarala.sunumairie";
 };
 
 const getAppName = () => {
@@ -78,9 +78,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			},
 		]
 	],
-    "extra": {
-      "eas": {
-        "projectId": "201544b1-2016-4f6f-a923-22e97a78b579"
-      }
+  "extra": {
+    "eas": {
+      "projectId": "8b2293b7-c0d7-46c1-a303-dbe4f2b068db"
     }
-  })
+  }
+})
